@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    dirver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://kaifa.mysql.guo-kai.com:3306/gk-ims?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useInformationSchema=true&useSSL=false
+    username: gkims-kaifa
+    password: PGrsByizeD357ajR
+logging:
+  level:
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
