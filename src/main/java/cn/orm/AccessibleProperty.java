@@ -9,19 +9,24 @@ import java.lang.reflect.Method;
  * @author ckn
  */
 class AccessibleProperty {
-
-    final Method getter;
-    final Method setter;
+    /**
+     * getter方法
+     */
+    Method getter;
+    /**
+     * setter方法
+     */
+    Method setter;
 
     /**
      * java type
      */
-    final Class<?> propertyType;
+    Class<?> propertyType;
 
     /**
      * java bean property name
      */
-    final String propertyName;
+    String propertyName;
 
     /**
      * table column name
@@ -31,11 +36,11 @@ class AccessibleProperty {
     boolean isId;
 
     boolean isId() {
-        return isId ==true;
+        return isId == true;
     }
 
     boolean isNotId() {
-       return isId ==false;
+        return isId == false;
     }
 
     public AccessibleProperty(PropertyDescriptor pd) {

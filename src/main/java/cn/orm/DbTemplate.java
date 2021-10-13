@@ -1,5 +1,6 @@
 package cn.orm;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.util.ObjectUtil;
@@ -10,8 +11,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
@@ -211,14 +214,35 @@ public class DbTemplate {
 
     /**
      * 通过 sql文件运行获得返回结果
-     * @param resourcePath 文件路径
-     * @param returnType 返回类型
+     * @param sqlPath
+     * @param parameters
+     * @param rowMapperClass
      * @return
      */
-    public List<Object> selectByFile(String resourcePath, Class returnType) {
-        ClassPathResource resourceDetailIds = new ClassPathResource(resourcePath);
-        String sqlResourceDetailIds = IoUtil.read(resourceDetailIds.getStream()).toString();
-        return null;
+    public List selectByFile(String sqlPath,Map<String,Object> parameters, Class rowMapperClass) {
+       //处理参数
+        Map<String,Object> parameterMap=new HashMap<>();
+        if(CollUtil.isNotEmpty(parameters)){
+            parameters.forEach((k,v)->{
+                if(v instanceof String){
+                    parameterMap.put(k,"'"+v+"'");
+                }else {
+                    parameterMap.put(k,v);
+                }
+            });
+        }
+        ClassPathResource resource = new ClassPathResource(sqlPath);
+        String sql = IoUtil.read(resource.getStream()).toString();
+        if(CollUtil.isNotEmpty(parameters)){
+            for(String key:parameterMap.keySet()){
+                Object o = parameterMap.get(key);
+                sql= sql.replace("#{"+key+"}",o+"");
+            }
+        }
+
+        RowMapper rowMapper=new BeanPropertyRowMapper<>(rowMapperClass);
+        List query = jdbcTemplate.query(sql, new Object[]{}, rowMapper);
+        return query;
     }
 
     public <T> void insert(T bean) {
