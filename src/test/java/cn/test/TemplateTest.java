@@ -1,9 +1,9 @@
 package cn.test;
 
-import cn.dto.PTO;
+import cn.ft.dto.PTO;
 import cn.hutool.json.JSONUtil;
-import cn.orm.DbTemplate;
-import cn.service.UserService;
+import cn.ft.orm.DbTemplate;
+import cn.ft.service.UserService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

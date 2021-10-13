@@ -1,4 +1,4 @@
-package cn.dto;
+package cn.ft.dto;
 
 import lombok.Data;
 

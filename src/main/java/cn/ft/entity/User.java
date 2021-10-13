@@ -1,9 +1,9 @@
-package cn.entity;
+package cn.ft.entity;
 
-import cn.annotation.Column;
-import cn.annotation.Id;
-import cn.annotation.Table;
-import cn.annotation.Entity;
+import cn.ft.annotation.Column;
+import cn.ft.annotation.Id;
+import cn.ft.annotation.Table;
+import cn.ft.annotation.Entity;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

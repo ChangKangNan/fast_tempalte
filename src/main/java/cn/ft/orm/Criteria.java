@@ -1,4 +1,4 @@
-package cn.orm;
+package cn.ft.orm;
 
 import cn.hutool.core.collection.CollUtil;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;

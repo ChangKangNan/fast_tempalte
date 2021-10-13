@@ -1,6 +1,6 @@
-package cn.service;
+package cn.ft.service;
 
-import cn.entity.User;
+import cn.ft.entity.User;
 
 import java.util.List;
 

@@ -1,11 +1,11 @@
-package cn.service.impl;
+package cn.ft.service.impl;
 
-import cn.dto.PTO;
-import cn.entity.Dep;
-import cn.entity.User;
+import cn.ft.dto.PTO;
+import cn.ft.entity.Dep;
+import cn.ft.entity.User;
 import cn.hutool.json.JSONUtil;
-import cn.orm.DbTemplate;
-import cn.service.UserService;
+import cn.ft.orm.DbTemplate;
+import cn.ft.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

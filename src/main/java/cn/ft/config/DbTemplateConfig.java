@@ -1,7 +1,7 @@
-package cn.config;
+package cn.ft.config;
 
-import cn.entity.User;
-import cn.orm.DbTemplate;
+import cn.ft.entity.User;
+import cn.ft.orm.DbTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;

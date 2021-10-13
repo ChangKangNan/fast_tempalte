@@ -1,4 +1,4 @@
-package cn.annotation;
+package cn.ft.annotation;
 
 import java.lang.annotation.*;
 

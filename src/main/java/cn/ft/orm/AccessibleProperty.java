@@ -1,4 +1,4 @@
-package cn.orm;
+package cn.ft.orm;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;

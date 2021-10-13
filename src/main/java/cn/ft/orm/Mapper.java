@@ -1,9 +1,9 @@
-package cn.orm;
+package cn.ft.orm;
 
-import cn.annotation.Column;
-import cn.annotation.Table;
+import cn.ft.annotation.Column;
+import cn.ft.annotation.Table;
 import cn.hutool.core.util.ArrayUtil;
-import cn.annotation.Id;
+import cn.ft.annotation.Id;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 
