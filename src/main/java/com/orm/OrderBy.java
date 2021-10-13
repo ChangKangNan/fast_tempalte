@@ -96,7 +96,7 @@ public final class OrderBy<T> extends CriteriaQuery<T> {
 	 * 
 	 * @return list.
 	 */
-	public List<Object> list(Class clazz) {
+	public List<Object> list(Class<?> clazz) {
 		return criteria.list(clazz);
 	}
 	/**

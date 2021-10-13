@@ -65,7 +65,7 @@ public final class From<T> extends CriteriaQuery<T> {
 	 * 
 	 * @return List of object T.
 	 */
-	public List<Object> list(Class clazz) {
+	public List<Object> list(Class<?> clazz) {
 		return this.criteria.list(clazz);
 	}
 	/**

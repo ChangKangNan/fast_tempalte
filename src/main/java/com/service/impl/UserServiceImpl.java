@@ -2,8 +2,6 @@ package com.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.dto.PTO;
-import com.em.DepEnum;
-import com.em.UserEnum;
 import com.entity.Dep;
 import com.entity.User;
 import com.orm.DbTemplate;
@@ -61,11 +59,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User register(String email, String password, String name) {
+	public User register(String email, String password, String name,Long departmentId) {
 		User user = new User();
 		user.setEmail(email);
 		user.setPassword(password);
 		user.setName(name);
+		user.setDidP(departmentId);
 		db.insert(user);
 		return user;
 	}
@@ -86,9 +85,9 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void selectByCondition() {
 		List<PTO> list = db
-				.select("name","dept_name")
+				.select("name", "dept_name")
 				.from(User.class)
-				.leftJoin(Dep.class, "department_id", "dept_id")
+				.leftJoin(Dep.class, "did_p", "dept_id")
 				.where("test_dep.dept_name=?", "业务部")
 				.list(PTO.class);
 		for (PTO user : list) {

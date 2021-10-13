@@ -72,7 +72,7 @@ public class Criteria<T> {
         return params.toArray();
     }
 
-     List<Object> list(Class clazz) {
+     List<Object> list(Class<?> clazz) {
         String selectSql = sql();
         Object[] selectParams = params();
         RowMapper rowMapper=new BeanPropertyRowMapper<>(clazz);

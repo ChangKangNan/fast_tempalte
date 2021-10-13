@@ -4,6 +4,7 @@ import com.annotation.Column;
 import com.annotation.Entity;
 import com.annotation.Id;
 import com.annotation.Table;
+import lombok.Data;
 import lombok.experimental.Accessors;
 
 
@@ -14,6 +15,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain=true)
 @Table(value = "test_dep")
 @Entity
+@Data
 public class Dep {
     @Id
     @Column(name = "dept_id")
@@ -22,20 +24,4 @@ public class Dep {
     @Column(name = "dept_name")
     private String deptName;
 
-
-    public Long getDeptId() {
-        return deptId;
-    }
-
-    public void setDeptId(Long deptId) {
-        this.deptId = deptId;
-    }
-
-    public String getDeptName() {
-        return deptName;
-    }
-
-    public void setDeptName(String deptName) {
-        this.deptName = deptName;
-    }
 }

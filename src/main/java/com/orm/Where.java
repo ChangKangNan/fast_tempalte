@@ -38,7 +38,7 @@ public final class Where<T> extends CriteriaQuery<T> {
 	 * 
 	 * @return list.
 	 */
-	public List<Object> list(Class clazz) {
+	public List<Object> list(Class<?> clazz) {
 		return this.criteria.list(clazz);
 	}
 

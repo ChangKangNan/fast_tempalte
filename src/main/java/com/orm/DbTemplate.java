@@ -144,14 +144,13 @@ public class DbTemplate {
                         n++;
                     } else {
                         dCount++;
-                        Column column = prop.field.getAnnotation(Column.class);
-                        String replace = column.name() + " = ?,";
+                        String replace = prop.columnName + " = ?,";
                         boolean contains = StrUtil.contains(mapper.updateSQL, replace);
                         String replacement = "";
                         if (contains) {
                             replacement = replace;
                         } else {
-                            replacement = ", " + column.name() + " = ?";
+                            replacement = ", " + prop.columnName + " = ?";
                         }
                         String format = StrUtil.replace(mapper.updateSQL, replacement, "");
                         mapper.updateSQL = format;
@@ -238,15 +237,14 @@ public class DbTemplate {
                     n++;
                 } else {
                     dCount++;
-                    Column column = prop.field.getAnnotation(Column.class);
                     String format = "";
-                    boolean contains = StrUtil.contains(mapper.insertSQL, ", " + column.name());
+                    boolean contains = StrUtil.contains(mapper.insertSQL, ", " + prop.columnName);
                     String replace = "";
                     String replaceUn = "(?,";
                     if (contains) {
-                        replace = ", " + column.name();
+                        replace = ", " + prop.columnName;
                     } else {
-                        replace = "(" + column.name();
+                        replace = "(" + prop.columnName;
                     }
                     format = StrUtil.replace(mapper.insertSQL, replace, "");
                     format = StrUtil.replace(format, replaceUn, "(");
