@@ -219,7 +219,7 @@ public class DbTemplate {
      * @param rowMapperClass
      * @return
      */
-    public List selectByFile(String sqlPath,Map<String,Object> parameters, Class rowMapperClass) {
+    public <E> List<E> selectByFile(String sqlPath,Map<String,Object> parameters, Class<E> rowMapperClass) {
        //处理参数
         Map<String,Object> parameterMap=new HashMap<>();
         if(CollUtil.isNotEmpty(parameters)){
@@ -240,8 +240,8 @@ public class DbTemplate {
             }
         }
 
-        RowMapper rowMapper=new BeanPropertyRowMapper<>(rowMapperClass);
-        List query = jdbcTemplate.query(sql, new Object[]{}, rowMapper);
+        RowMapper<E>  rowMapper=new BeanPropertyRowMapper<>(rowMapperClass);
+        List<E>  query = jdbcTemplate.query(sql, new Object[]{}, rowMapper);
         return query;
     }
 

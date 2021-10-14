@@ -72,10 +72,10 @@ public class Criteria<T> {
         return params.toArray();
     }
 
-     List<Object> list(Class<?> clazz) {
+    public <E> List<E> list(Class<E> clazz) {
         String selectSql = sql();
         Object[] selectParams = params();
-        RowMapper rowMapper=new BeanPropertyRowMapper<>(clazz);
+        RowMapper<E> rowMapper=new BeanPropertyRowMapper<>(clazz);
         return db.jdbcTemplate.query(selectSql, selectParams,rowMapper);
     }
 

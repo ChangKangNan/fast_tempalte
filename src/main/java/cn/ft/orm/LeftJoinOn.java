@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class LeftJoinOn<T> extends CriteriaQuery<T> {
 
-    public  LeftJoinOn(Criteria<T> criteria, Mapper<T> mapper,String filedFrom,String filedRight) {
+    public LeftJoinOn(Criteria<T> criteria, Mapper<?> mapper,String filedFrom,String filedRight) {
         super(criteria);
         this.criteria.leftJoinSql.add(" LEFT JOIN "+mapper.tableName
                 + " ON "+criteria.table+"."+filedFrom
@@ -72,7 +72,7 @@ public class LeftJoinOn<T> extends CriteriaQuery<T> {
      *
      * @return List of object T.
      */
-    public List<Object> list(Class<?> clazz) {
+    public <E> List<E> list(Class<E> clazz) {
         return this.criteria.list(clazz);
     }
 

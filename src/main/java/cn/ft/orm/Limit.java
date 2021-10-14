@@ -28,7 +28,7 @@ public final class Limit<T> extends CriteriaQuery<T> {
 	 * 
 	 * @return List of object T.
 	 */
-	public List<Object> list(Class<?> clazz) {
+	public <E> List<E> list(Class<E> clazz) {
 		return criteria.list(clazz);
 	}
 

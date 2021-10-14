@@ -28,9 +28,9 @@ public class TemplateTest {
 
     @Test
     public void test() {
-        Map map=new HashMap();
+        Map<String,Object> map=new HashMap();
         map.put("depName","业务部");
-        List<PTO> objects = dbTemplate.selectByFile("/sql/y.sql", map,PTO.class);
+        List<PTO> objects = dbTemplate.selectByFile("/sql/y.sql", map, PTO.class);
         System.out.println(JSONUtil.toJsonStr(objects));
     }
 }

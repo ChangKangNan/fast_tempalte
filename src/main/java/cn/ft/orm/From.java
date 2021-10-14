@@ -65,7 +65,7 @@ public final class From<T> extends CriteriaQuery<T> {
 	 * 
 	 * @return List of object T.
 	 */
-	public List<Object> list(Class<?> clazz) {
+	public <E> List<E> list(Class<E> clazz) {
 		return this.criteria.list(clazz);
 	}
 	/**
@@ -98,10 +98,8 @@ public final class From<T> extends CriteriaQuery<T> {
 
 	/**
 	 * Left join Example
-	 * @param entityClass
-	 * @return
 	 */
-	public LeftJoinOn leftJoin(Class entityClass,String filedFrom,String fieldLeft) {
-		return new LeftJoinOn(this.criteria, this.criteria.db.getMapper(entityClass),filedFrom,fieldLeft);
+	public LeftJoinOn<T> leftJoin(Class<?> entityClass,String filedFrom,String fieldLeft) {
+		return new LeftJoinOn<>(this.criteria, this.criteria.db.getMapper(entityClass),filedFrom,fieldLeft);
 	}
 }
