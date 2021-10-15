@@ -25,21 +25,7 @@ import java.util.Set;
 public class TableFileCreateUtils {
     private static final String TEMPLATE_PATH = "src/main/resources/template";
     private static final String CLASS_PATH = "src/main/java/cn/ft/pojo";
-    /**
-     * 生成文件
-     * @param codeParameter 重要:请参考参数设置
-     */
-    public static void create(FileConfig codeParameter){
-        try {
-            //表信息
-            List<TableInfo> tableInfos = getTableInfos(codeParameter);
-            //生成文件
-            createFile(codeParameter, tableInfos);
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
 
-    }
 
     /**
      * 需要生成代码的表
@@ -180,7 +166,6 @@ public class TableFileCreateUtils {
     private static void createFile(FileConfig conf, String filePath, Map<String, Object> root, Template temp) throws IOException, TemplateException, freemarker.template.TemplateException {
         String separator = File.separator;
         boolean replaceFile = conf.getReplaceFile();
-        String fileName = filePath.substring(filePath.lastIndexOf(separator) + 1);
         String subPath;
         subPath = filePath.substring(0, filePath.lastIndexOf(separator));
         File directory = new File(subPath);

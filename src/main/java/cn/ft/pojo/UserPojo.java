@@ -18,25 +18,25 @@ import lombok.experimental.Accessors;
 @Data
 public class UserPojo {
 
-@Id
-@Column(name = "id")
-private Long id;
+    @Id
+    @Column(name = "id")
+    private Long id;
 
 
-@Column(name = "name")
-private String name;
+    @Column(name = "name")
+    private String name;
 
 
-@Column(name = "password")
-private String password;
+    @Column(name = "password")
+    private String password;
 
 
-@Column(name = "email")
-private String email;
+    @Column(name = "email")
+    private String email;
 
 
-@Column(name = "did_p")
-private Long didP;
+    @Column(name = "departmentId")
+    private Long departmentId;
 
 
 }

@@ -27,10 +27,10 @@ public class ${className} {
 <#list propertys as p>
 
 <#if p.propertyName = k>
-@Id
+    @Id
 </#if>
-@Column(name = "${columns["${p.propertyName}"]}")
-private ${types["${p.propertyName}"]} ${p.propertyName};
+    @Column(name = "${columns["${p.propertyName}"]}")
+    private ${types["${p.propertyName}"]} ${p.propertyName};
 
 </#list>
 
