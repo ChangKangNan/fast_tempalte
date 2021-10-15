@@ -20,4 +20,8 @@ public class ColumnInfo {
      * 字段注释
      */
     private String columnRemarks;
+    /**
+     * 是否是主键
+     */
+    private boolean isKey;
 }

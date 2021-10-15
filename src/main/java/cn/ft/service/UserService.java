@@ -1,6 +1,6 @@
 package cn.ft.service;
 
-import cn.ft.entity.User;
+import cn.ft.pojo.User;
 
 import java.util.List;
 

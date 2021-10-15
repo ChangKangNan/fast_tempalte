@@ -1,6 +1,6 @@
 package cn.ft.config;
 
-import cn.ft.entity.User;
+import cn.ft.pojo.User;
 import cn.ft.orm.DbTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

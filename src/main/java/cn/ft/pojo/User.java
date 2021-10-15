@@ -1,4 +1,4 @@
-package cn.ft.entity;
+package cn.ft.pojo;
 
 import cn.ft.annotation.Column;
 import cn.ft.annotation.Id;

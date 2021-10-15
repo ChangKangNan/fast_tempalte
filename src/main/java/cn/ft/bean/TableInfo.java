@@ -16,6 +16,8 @@ public class TableInfo {
      */
     private String tableName;
 
+    private String key;
+
     /**
      * 前缀名
      */

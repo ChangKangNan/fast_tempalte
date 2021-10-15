@@ -3,7 +3,9 @@ package cn.ft.util;
 import cn.ft.bean.FileConfig;
 import cn.ft.bean.TableInfo;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.template.TemplateException;
+import cn.hutool.json.JSONUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
@@ -21,7 +23,8 @@ import java.util.Set;
  * @author kangnan.chang
  */
 public class TableFileCreateUtils {
-
+    private static final String TEMPLATE_PATH = "src/main/resources/template";
+    private static final String CLASS_PATH = "src/main/java/cn/ft/pojo";
     /**
      * 生成文件
      * @param codeParameter 重要:请参考参数设置
@@ -58,6 +61,89 @@ public class TableFileCreateUtils {
         return DbUtils.getInstance().getAllTables(conf, metaData, tableNames);
     }
 
+
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+        FileConfig config = new FileConfig();
+        //数据库连接
+        config.setDBInfo("jdbc:mysql://kaifa.mysql.guo-kai.com:3306/gk-ims?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useInformationSchema=true","gkims-kaifa","PGrsByizeD357ajR","com.mysql.jdbc.Driver");
+        //选择生成的文件
+        config.setNeedModules(FileConfig.CodeCreateModule.Base);
+        //是否生成表前缀
+        config.setPrefix(true,false,null);
+        //是否使用lombok插件
+        config.setUseLombok(true);
+        //是否下划线转大小写,默认true
+        config.setUnderline2CamelStr(true);
+        config.setUseDTOSwagger2(true);
+        //是否覆盖原文件,默认false
+        config.setReplaceFile(true);
+        //文件生成的包路径
+        config.setBasePackage("com.gk.ims.funding");
+        //项目多模块空间
+        config.setChildModuleName("gk-ims-funding-v2-service");
+        config.setCreateTables("test_user");
+        createPOJOTemplate(config);
+
+    }
+
+    public static  void createPOJOTemplate(FileConfig config){
+        try {
+            //表信息
+            List<TableInfo> tableInfos = getTableInfos(config);
+            //生成文件
+            Set<String> createTables = config.getCreateTables();
+            for (TableInfo info : tableInfos) {
+                String tableName = info.getTableName();
+                for (String table : createTables) {
+                    if(tableName.equals(table)){
+                        System.out.println(JSONUtil.toJsonStr(info));
+                        //开始生成文件
+                        // step1 创建freeMarker配置实例
+                        Configuration configuration = new Configuration(Configuration.getVersion());
+                        Writer out = null;
+                        try {
+                            // step2 获取模版路径
+                            configuration.setDirectoryForTemplateLoading(new File(TEMPLATE_PATH));
+                            // step3 创建数据模型
+                            Map<String, Object> dataMap = new HashMap<String, Object>();
+                            info.setPojoName(info.getPojoName()+"Pojo");
+                            dataMap.put("table", info);
+                            dataMap.put("package", "cn.ft.pojo");
+                            Map<String, String> primaryKey = info.getPrimaryKey();
+                            String key="";
+                            for(String k:primaryKey.keySet()){
+                                key=k;
+                            }
+                            info.setKey(key);
+                            String infoTableName =StrUtil.toCamelCase(info.getTableName()) ;
+                            // step4 加载模版文件
+                            Template template = configuration.getTemplate("Pojo.ftl");
+                            // step5 生成数据
+                            File docFile = new File(CLASS_PATH + "\\" + info.getPojoName()+".java");
+                            out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(docFile)));
+                            // step6 输出文件
+                            template.process(dataMap, out);
+                            System.out.println(infoTableName+"Pojo.java"+"文件创建成功 !");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+                            try {
+                                if (null != out) {
+                                    out.flush();
+                                }
+                            } catch (Exception e2) {
+                                e2.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     /**
      * @param conf       配置
      * @param tableInfos 表信息
@@ -65,7 +151,7 @@ public class TableFileCreateUtils {
      * @throws TemplateException 错误
      */
     private static void createFile(FileConfig conf, List<TableInfo> tableInfos) throws IOException, TemplateException, freemarker.template.TemplateException {
-        Configuration cfg = new Configuration(Configuration.VERSION_2_3_22);
+        Configuration cfg = new Configuration(Configuration.getVersion());
         cfg.setClassLoaderForTemplateLoading(TableFileCreateUtils.class.getClassLoader(), "templates");
         cfg.setDefaultEncoding("UTF-8");
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
@@ -79,21 +165,6 @@ public class TableFileCreateUtils {
                 if (FileConfig.CodeCreateModule.Pojo.codeModule.equals(module)) {
                     Template temp = cfg.getTemplate("Pojo.ftl");
                     createFile(conf, tableInfo.getPojoFilePath(), root, temp);
-                } else if (FileConfig.CodeCreateModule.FastPojo.codeModule.equals(module)) {
-                    Template temp = cfg.getTemplate("FastPojo.ftl");
-                    createFile(conf, tableInfo.getFastPojoFilePath(), root, temp);
-                }else if (FileConfig.CodeCreateModule.PojoFastDao.codeModule.equals(module)) {
-                    Template temp = cfg.getTemplate("PojoFastDao.ftl");
-                    createFile(conf, tableInfo.getPojoFastDaoFilePath(), root, temp);
-                } else if (FileConfig.CodeCreateModule.Service.codeModule.equals(module)) {
-                    Template temp = cfg.getTemplate("IService.ftl");
-                    createFile(conf, tableInfo.getIserviceFilePath(), root, temp);
-                } else if (FileConfig.CodeCreateModule.Dto.codeModule.equals(module)) {
-                    Template temp = cfg.getTemplate("Dto.ftl");
-                    createFile(conf, tableInfo.getDtoFilePath(), root, temp);
-                }  else if (FileConfig.CodeCreateModule.Dao.codeModule.equals(module)) {
-                    Template temp = cfg.getTemplate("Dao.ftl");
-                    createFile(conf, tableInfo.getDaoFilePath(), root, temp);
                 }
             }
         }

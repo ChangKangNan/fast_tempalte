@@ -1,8 +1,8 @@
 package cn.ft.service.impl;
 
 import cn.ft.dto.PTO;
-import cn.ft.entity.Dep;
-import cn.ft.entity.User;
+import cn.ft.pojo.Dep;
+import cn.ft.pojo.User;
 import cn.hutool.json.JSONUtil;
 import cn.ft.orm.DbTemplate;
 import cn.ft.service.UserService;
