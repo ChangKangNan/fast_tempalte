@@ -6,7 +6,8 @@ import cn.ft.annotation.Entity;
 import cn.ft.annotation.Id;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
 * @author kangnan.chang
@@ -35,8 +36,16 @@ public class UserPojo {
     private String email;
 
 
-    @Column(name = "departmentId")
+    @Column(name = "department_id")
     private Long departmentId;
+
+
+    @Column(name = "t_date")
+    private Date tDate;
+
+
+    @Column(name = "numbers")
+    private BigDecimal numbers;
 
 
 }

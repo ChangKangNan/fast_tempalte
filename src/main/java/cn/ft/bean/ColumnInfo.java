@@ -3,7 +3,7 @@ package cn.ft.bean;
 import lombok.Data;
 
 /**
- * 表的所有字段
+ * 列信息
  * @author kangnan.chang
  */
 @Data
@@ -23,5 +23,14 @@ public class ColumnInfo {
     /**
      * 是否是主键
      */
-    private boolean isKey;
+    private boolean key;
+    /**
+     * 转译属性名
+     */
+    private String propertyName;
+    /**
+     * 转译属性类型
+     */
+    private String propertyType;
+
 }

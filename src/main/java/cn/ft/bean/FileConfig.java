@@ -175,13 +175,9 @@ public class FileConfig {
     /**
      * 是否过滤表前缀信息
      * @param prefix 生成文件时候是否过滤表前缀信息，ord_orders = orders
-     * @param prefixFileDir 是否通过前缀信息生成不同的文件目录,ord_orders 会为将orders生成的模板存储在ord目录下
-     * @param prefixName 过滤指定前缀,如果不指定传 null
      */
-    public void setPrefix(Boolean prefix, Boolean prefixFileDir, String prefixName) {
+    public void setIgnorePrefix(Boolean prefix) {
         this.prefix = prefix;
-        this.prefixFileDir = prefixFileDir;
-        this.prefixName = prefixName;
     }
 
     /**
