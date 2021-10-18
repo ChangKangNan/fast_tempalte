@@ -139,7 +139,14 @@ public class DbUtil {
     public void setPackPath(FileConfig conf, TableInfo tableInfo) {
         String separator = File.separator;
         String resourcesBasePath = new StringBuilder().append(System.getProperty("user.dir")).append(separator).append("src").append(separator).append("main").append(separator).append("resources").append(separator).toString();
-        String javaBasePath = new StringBuilder().append(System.getProperty("user.dir")).append(separator).append(conf.getChildModuleName()).append(separator).append("src").append(separator).append("main").append(separator).append("java").append(separator).toString();
+        String childModuleName = conf.getChildModuleName();
+        StringBuilder javaBasePath =new StringBuilder();
+        if(StrUtil.isNotBlank(childModuleName)){
+            javaBasePath.append(System.getProperty("user.dir")).append(separator).append(childModuleName).append(separator).append("src").append(separator).append("main").append(separator).append("java").append(separator).toString();
+        }else {
+            javaBasePath.append(System.getProperty("user.dir")).append(separator).append("src").append(separator).append("main").append(separator).append("java").append(separator).toString();
+
+        }
         String pojoPackagePath = conf.getBasePackage() + "." + "pojo";
         tableInfo.setPojoPackagePath(pojoPackagePath);
         tableInfo.setPojoFilePath(javaBasePath + tableInfo.getPojoPackagePath().replace(".", separator) + separator + tableInfo.getPojoName() + ".java");

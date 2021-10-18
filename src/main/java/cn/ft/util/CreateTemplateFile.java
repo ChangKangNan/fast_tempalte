@@ -29,7 +29,6 @@ public class CreateTemplateFile {
             List<TableInfo> tableInfos = DbUtil.getInstance().getAllTables(config, connection.getMetaData(), createTables);
             if (CollUtil.isNotEmpty(tableInfos)) {
                 for (TableInfo info : tableInfos) {
-                    System.out.println(JSONUtil.toJsonStr(info));
                     createTemplate(info, config.getReplaceFile());
                 }
             }
