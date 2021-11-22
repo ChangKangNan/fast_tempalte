@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
  *
  * @author ckn
  */
-class AccessibleProperty {
+public class AccessibleProperty {
     /**
      * getter方法
      */

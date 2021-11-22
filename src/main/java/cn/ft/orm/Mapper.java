@@ -27,22 +27,22 @@ public class Mapper<T> {
     /**
      * @Id property
      */
-    final AccessibleProperty id;
+   public final AccessibleProperty id;
 
     /**
      * all properties including @Id, key is property name (NOT column name)
      */
-    final List<AccessibleProperty> allProperties;
+   public final List<AccessibleProperty> allProperties;
 
     /**
      * lower-case property name -> AccessibleProperty
      */
     final Map<String, AccessibleProperty> allPropertiesMap;
 
-    final List<AccessibleProperty> properties;
+    public final List<AccessibleProperty> properties;
 
 
-    final RowMapper<T> rowMapper;
+    public final RowMapper<T> rowMapper;
 
     public Mapper(Class<T> clazz) throws Exception {
         List<AccessibleProperty> accessibleProperties = getProperties(clazz);

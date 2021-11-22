@@ -1,6 +1,8 @@
 package cn.test;
 
 import cn.ft.dto.PTO;
+import cn.ft.pojo.TestPojo;
+import cn.ft.pojo.User;
 import cn.hutool.json.JSONUtil;
 import cn.ft.orm.DbTemplate;
 import cn.ft.service.UserService;
@@ -32,5 +34,11 @@ public class TemplateTest {
         map.put("depName","业务部");
         List<PTO> objects = dbTemplate.selectByFile("/sql/y.sql", map, PTO.class);
         System.out.println(JSONUtil.toJsonStr(objects));
+    }
+
+    @Test
+    public void test1(){
+        List<User> users = TestPojo.create().findAll();
+        System.out.println(JSONUtil.toJsonStr(users));
     }
 }

@@ -40,20 +40,25 @@ public class DbTemplate {
      */
     private Map<Class<?>, Mapper<?>> classMapping;
 
+    public Map<String, Mapper<?>> classMappingPojo;
+
     public DbTemplate(JdbcTemplate jdbcTemplate, String basePackage) {
         this.jdbcTemplate = jdbcTemplate;
         List<Class<?>> classes = scanEntities(basePackage);
         Map<Class<?>, Mapper<?>> classMapping = new HashMap<>();
+        Map<String, Mapper<?>> classMappingPojo = new HashMap<>();
         try {
             for (Class<?> clazz : classes) {
                 logger.info("Found class: " + clazz.getName());
                 Mapper<?> mapper = new Mapper<>(clazz);
                 classMapping.put(clazz, mapper);
+                classMappingPojo.put(clazz.getSimpleName(),mapper);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         this.classMapping = classMapping;
+        this.classMappingPojo=classMappingPojo;
     }
 
     /**
@@ -338,7 +343,7 @@ public class DbTemplate {
         return mapper;
     }
 
-    private static List<Class<?>> scanEntities(String basePackage) {
+    public static List<Class<?>> scanEntities(String basePackage) {
         ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
         provider.addIncludeFilter(new AnnotationTypeFilter(Entity.class));
         List<Class<?>> classes = new ArrayList<>();

@@ -7,7 +7,7 @@ package cn.ft.orm;
  * 
  * @param <T> Generic type.
  */
-abstract class CriteriaQuery<T> {
+public abstract class CriteriaQuery<T> {
 
 	protected final Criteria<T> criteria;
 
