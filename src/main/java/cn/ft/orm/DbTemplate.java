@@ -83,9 +83,10 @@ public class DbTemplate {
      */
     public <T> T fetch(Class<T> clazz, Object id) {
         Mapper<T> mapper = getMapper(clazz);
-        logger.info("SQL: " + mapper.selectSQL);
-        System.out.println("SQL: " + mapper.selectSQL);
-        List<T> list = (List<T>) jdbcTemplate.query(mapper.selectSQL, new Object[]{id}, mapper.rowMapper);
+        String selectSQL = "SELECT * FROM " + mapper.tableName + " WHERE " + mapper.id.columnName + " = ?";
+        logger.info("SQL: " + selectSQL);
+        System.out.println("SQL: " + selectSQL);
+        List<T> list = (List<T>) jdbcTemplate.query(selectSQL, new Object[]{id}, mapper.rowMapper);
         if (list.isEmpty()) {
             return null;
         }
@@ -111,7 +112,8 @@ public class DbTemplate {
      */
     public <T> void delete(Class<T> clazz, Object id) {
         Mapper<?> mapper = getMapper(clazz);
-        jdbcTemplate.update(mapper.deleteSQL, id);
+        String deleteSQL = "DELETE FROM " + mapper.tableName + " WHERE " + mapper.id.columnName + " = ?";
+        jdbcTemplate.update(deleteSQL, id);
     }
 
     @SuppressWarnings("rawtypes")
@@ -124,6 +126,31 @@ public class DbTemplate {
         return new From<>(new Criteria<>(this), mapper);
     }
 
+    public  String fetchUpdateSql(Mapper<?> mapper){
+        String updateSQL = "UPDATE " + mapper.tableName + " SET "
+                + String.join(", ",
+                mapper.properties.stream().filter(AccessibleProperty::isNotId).map(p -> p.columnName + " = ?").toArray(String[]::new))
+                + " WHERE " + mapper.id.columnName + " = ?";
+        return updateSQL;
+    }
+
+    public  String fetchInsertSql(Mapper<?> mapper){
+        String insertSQL = "INSERT INTO " + mapper.tableName + " ("
+                + String.join(", ",  mapper.properties.stream().map(p -> p.columnName).toArray(String[]::new))
+                + ") VALUES (" + numOfQuestions(mapper.properties.size()) + ")";
+        return insertSQL;
+    }
+    /**
+     * ?包装返回值
+     * @param n
+     * @return
+     */
+    private String numOfQuestions(int n) {
+        String[] qs = new String[n];
+        return String.join(", ", Arrays.stream(qs).map((s) -> {
+            return "?";
+        }).toArray(String[]::new));
+    }
     /**
      * Update com.entity's updatable properties by id.
      *
@@ -133,10 +160,11 @@ public class DbTemplate {
     public <T> void update(T bean) {
         try {
             final Mapper<?> mapper = getMapper(bean.getClass());
+            String updateSQL=fetchUpdateSql(mapper);
             int n = 0;
             int dCount = 0;
-            Object[] args = new Object[mapper.updatableProperties.size()];
-            for (AccessibleProperty prop : mapper.updatableProperties) {
+            Object[] args = new Object[mapper.properties.size()];
+            for (AccessibleProperty prop : mapper.properties) {
                 boolean notId = prop.isNotId();
                 if (notId) {
                     Object invoke = prop.getter.invoke(bean);
@@ -146,15 +174,15 @@ public class DbTemplate {
                     } else {
                         dCount++;
                         String replace = prop.columnName + " = ?,";
-                        boolean contains = StrUtil.contains(mapper.updateSQL, replace);
+                        boolean contains = StrUtil.contains(updateSQL, replace);
                         String replacement = "";
                         if (contains) {
                             replacement = replace;
                         } else {
                             replacement = ", " + prop.columnName + " = ?";
                         }
-                        String format = StrUtil.replace(mapper.updateSQL, replacement, "");
-                        mapper.updateSQL = format;
+                        String format = StrUtil.replace(updateSQL, replacement, "");
+                        updateSQL = format;
                     }
                 }
             }
@@ -163,14 +191,14 @@ public class DbTemplate {
                 throw new RuntimeException("未传入主键!");
             }
             args[n] = invoke;
-            Object[] argsFinal = new Object[mapper.updatableProperties.size() - dCount];
-            for (int i = 0; i < mapper.updatableProperties.size() - dCount; i++) {
+            Object[] argsFinal = new Object[mapper.properties.size() - dCount];
+            for (int i = 0; i < mapper.properties.size() - dCount; i++) {
                 argsFinal[i] = args[i];
             }
             if (args.length == 1) {
                 throw new RuntimeException("无更新属性!");
             }
-            jdbcTemplate.update(mapper.updateSQL, argsFinal);
+            jdbcTemplate.update(updateSQL, argsFinal);
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }
@@ -185,9 +213,10 @@ public class DbTemplate {
     public <T> void updateOverwrite(T bean) {
         try {
             Mapper<?> mapper = getMapper(bean.getClass());
-            Object[] args = new Object[mapper.updatableProperties.size()];
+            String updateSQL=fetchUpdateSql(mapper);
+            Object[] args = new Object[mapper.properties.size()];
             int n = 0;
-            for (AccessibleProperty prop : mapper.updatableProperties) {
+            for (AccessibleProperty prop : mapper.properties) {
                 boolean notId = prop.isNotId();
                 if (notId) {
                     args[n] = prop.getter.invoke(bean);
@@ -195,7 +224,7 @@ public class DbTemplate {
                 }
             }
             args[n] = mapper.id.getter.invoke(bean);
-            jdbcTemplate.update(mapper.updateSQL, args);
+            jdbcTemplate.update(updateSQL, args);
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }
@@ -249,10 +278,11 @@ public class DbTemplate {
         try {
             int rows;
             final Mapper<?> mapper = getMapper(bean.getClass());
-            Object[] args = new Object[mapper.insertableProperties.size()];
+            String insertSQL=fetchInsertSql(mapper);
+            Object[] args = new Object[mapper.properties.size()];
             int n = 0;
             int dCount = 0;
-            for (AccessibleProperty prop : mapper.insertableProperties) {
+            for (AccessibleProperty prop : mapper.properties) {
                 Object invoke = prop.getter.invoke(bean);
                 if (ObjectUtil.isNotEmpty(invoke)) {
                     args[n] = invoke;
@@ -260,7 +290,7 @@ public class DbTemplate {
                 } else {
                     dCount++;
                     String format = "";
-                    boolean contains = StrUtil.contains(mapper.insertSQL, ", " + prop.columnName);
+                    boolean contains = StrUtil.contains(insertSQL, ", " + prop.columnName);
                     String replace = "";
                     String replaceUn = "(?,";
                     if (contains) {
@@ -268,18 +298,19 @@ public class DbTemplate {
                     } else {
                         replace = "(" + prop.columnName;
                     }
-                    format = StrUtil.replace(mapper.insertSQL, replace, "");
+                    format = StrUtil.replace(insertSQL, replace, "");
                     format = StrUtil.replace(format, replaceUn, "(");
-                    mapper.insertSQL = format;
+                    insertSQL = format;
                 }
             }
             final int finalCount = dCount;
             if (mapper.id.isId()) {
                 KeyHolder keyHolder = new GeneratedKeyHolder();
+                String finalInsertSQL = insertSQL;
                 rows = jdbcTemplate.update(new PreparedStatementCreator() {
                     @Override
                     public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                        PreparedStatement ps = connection.prepareStatement(mapper.insertSQL,
+                        PreparedStatement ps = connection.prepareStatement(finalInsertSQL,
                                 Statement.RETURN_GENERATED_KEYS);
                         for (int i = 0; i < args.length - finalCount; i++) {
                             ps.setObject(i + 1, args[i]);
@@ -291,7 +322,7 @@ public class DbTemplate {
                     mapper.id.setter.invoke(bean, keyHolder.getKey());
                 }
             } else {
-                rows = jdbcTemplate.update(mapper.insertSQL, args);
+                rows = jdbcTemplate.update(insertSQL, args);
             }
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
