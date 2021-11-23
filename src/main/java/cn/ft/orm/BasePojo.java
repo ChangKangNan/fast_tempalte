@@ -1,11 +1,7 @@
 package cn.ft.orm;
 
-import cn.ft.pojo.User;
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.extra.spring.SpringUtil;
-import cn.hutool.json.JSONUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -25,70 +21,75 @@ public class BasePojo<T> {
     protected String tableName;
     protected String className;
     protected String id;
-    protected HashMap<String, List> conditions;
+    protected Map<String, List> conditions;
     protected List<AccessibleProperty> accessibleProperties;
     protected RowMapper<T> rowMapper;
 
     /**
      * 初始化
      */
-    public  void init(){
+    protected void init() {
         dbTemplate = SpringUtil.getBean(DbTemplate.class);
-        Map<String, Mapper<?>> classMappingPojo= dbTemplate.classMappingPojo;
-        Mapper<T> mapper = (Mapper<T>) classMappingPojo.get(className);
-        accessibleProperties= mapper.properties;
-        id=mapper.id.columnName;
-        rowMapper= mapper.rowMapper;
         jdbcTemplate = SpringUtil.getBean("jdbcTemplate");
+        conditions = new HashMap<>(168);
+        Map<String, Mapper<?>> classMappingPojo = dbTemplate.classMappingPojo;
+        Mapper<T> mapper = (Mapper<T>) classMappingPojo.get(className);
+        accessibleProperties = mapper.properties;
+        id = mapper.id.columnName;
+        rowMapper = mapper.rowMapper;
     }
 
-    public List<T> findAll() {
-         init();
-         String selectSql = sql();
-        if(CollUtil.isNotEmpty(conditions)){
-            selectSql+=" WHERE ";
+    public String packageConditionSql() {
+        String selectSql = sql();
+        if (CollUtil.isNotEmpty(conditions)) {
+            selectSql += " WHERE 1";
             Set<String> set = conditions.keySet();
             for (String key : set) {
                 List list = conditions.get(key);
-                if(list.size()==1){
+                selectSql += " AND ";
+                if (list.size() == 1) {
                     Object o = list.get(0);
-                    if(o instanceof  String){
-                        selectSql+=key+"= '"+list.get(0)+"'";
-                    }else {
-                        selectSql+=key+"= "+list.get(0);
+                    if (o instanceof String) {
+                        selectSql += key + "= '" + list.get(0) + "'";
+                    } else {
+                        selectSql += key + "= " + list.get(0);
                     }
-                }else {
-                    selectSql+=key+" in ("+ String.join(", ",(String[])list.stream().map(p -> {
-                        if (p instanceof String) {
-                            return "'" + p + "'";
-                        } else {
-                            return "" + p;
-                        }
-                    }).toArray(String[]::new))+")";
+                } else {
+                    selectSql += key +
+                            " in (" +
+                            String.join(", ", (String[]) list.stream().map(p -> {
+                                if (p instanceof String) {
+                                    return "'" + p + "'";
+                                } else {
+                                    return "" + p;
+                                }
+                            })
+                                    .toArray(String[]::new))
+                            + ")";
                 }
             }
         }
-        System.out.println(selectSql);
-        System.out.println(jdbcTemplate==null);
-        List<T> list = jdbcTemplate.query(selectSql, new Object[]{},rowMapper);
+        return selectSql;
+    }
+
+    public List<T> findAll() {
+        String selectSql = packageConditionSql();
+        List<T> list = jdbcTemplate.query(selectSql, new Object[]{}, rowMapper);
         return list;
     }
 
     public List<T> findOne() {
-        init();
-        String selectSql = sql();
-        if(CollUtil.isNotEmpty(conditions)){
-
-        }
-        return null;
+        String selectSql = packageConditionSql();
+        selectSql += " limit 0,1";
+        List<T> list = jdbcTemplate.query(selectSql, new Object[]{}, rowMapper);
+        return list;
     }
-    public List<T> limit(Integer index,Integer count) {
-        init();
-        String selectSql = sql();
-        if(CollUtil.isNotEmpty(conditions)){
 
-        }
-        return null;
+    public List<T> limit(Integer pageIndex, Integer pageSize) {
+        String selectSql = packageConditionSql();
+        selectSql += " limit " + (pageIndex - 1) * pageSize + "," + pageSize;
+        List<T> list = jdbcTemplate.query(selectSql, new Object[]{}, rowMapper);
+        return list;
     }
 
     String sql() {

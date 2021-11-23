@@ -15,33 +15,34 @@ public class TestPojo extends BasePojo<User> {
 
     public static TestPojo create() {
         TestPojo testPojo = new TestPojo();
-        testPojo.tableName="test_user";
-        testPojo.className="User";
+        testPojo.tableName = "test_user";
+        testPojo.className = "User";
+        testPojo.init();
         return testPojo;
     }
 
     public TestPojo id(Long... ids) {
-        conditions.put("id", Arrays.stream(ids).distinct().collect(Collectors.toList()));
+        this.conditions.put("id", Arrays.stream(ids).distinct().collect(Collectors.toList()));
         return this;
     }
 
     public TestPojo email(String... emails) {
-        conditions.put("email", Arrays.stream(emails).distinct().collect(Collectors.toList()));
+        this.conditions.put("email", Arrays.stream(emails).distinct().collect(Collectors.toList()));
         return this;
     }
 
     public TestPojo password(String... passwords) {
-        conditions.put("email", Arrays.stream(passwords).distinct().collect(Collectors.toList()));
+        this.conditions.put("password", Arrays.stream(passwords).distinct().collect(Collectors.toList()));
         return this;
     }
 
     public TestPojo name(String... names) {
-        conditions.put("email", Arrays.stream(names).distinct().collect(Collectors.toList()));
+        this.conditions.put("name", Arrays.stream(names).distinct().collect(Collectors.toList()));
         return this;
     }
 
     public TestPojo didP(String... didPs) {
-        conditions.put("email", Arrays.stream(didPs).distinct().collect(Collectors.toList()));
+        this.conditions.put("didP", Arrays.stream(didPs).distinct().collect(Collectors.toList()));
         return this;
     }
 }

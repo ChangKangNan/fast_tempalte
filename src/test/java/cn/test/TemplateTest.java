@@ -38,7 +38,7 @@ public class TemplateTest {
 
     @Test
     public void test1(){
-        List<User> users = TestPojo.create().findAll();
+        List<User> users = TestPojo.create().name("abc","hjy").password("666666").findAll();
         System.out.println(JSONUtil.toJsonStr(users));
     }
 }
