@@ -2,6 +2,7 @@ package cn.ft.orm;
 
 import cn.ft.annotation.Column;
 import cn.ft.annotation.Table;
+import cn.ft.exception.VUtils;
 import cn.hutool.core.util.ArrayUtil;
 import cn.ft.annotation.Id;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -26,37 +27,30 @@ public class Mapper<T> {
     /**
      * @Id property
      */
-    final AccessibleProperty id;
+   public final AccessibleProperty id;
 
     /**
      * all properties including @Id, key is property name (NOT column name)
      */
-    final List<AccessibleProperty> allProperties;
+   public final List<AccessibleProperty> allProperties;
 
     /**
      * lower-case property name -> AccessibleProperty
      */
     final Map<String, AccessibleProperty> allPropertiesMap;
 
-    final List<AccessibleProperty> insertableProperties;
+    public final List<AccessibleProperty> properties;
 
-    final List<AccessibleProperty> updatableProperties;
 
-    final RowMapper<T> rowMapper;
-
-    String selectSQL;
-    String insertSQL;
-    String updateSQL;
-    String deleteSQL;
+    public final RowMapper<T> rowMapper;
 
     public Mapper(Class<T> clazz) throws Exception {
-
-        List<AccessibleProperty> all = getProperties(clazz);
+        List<AccessibleProperty> accessibleProperties = getProperties(clazz);
         Field[] declaredFields = clazz.getDeclaredFields();
         if (ArrayUtil.isNotEmpty(declaredFields)) {
             for (Field field : declaredFields) {
                 String fieldName = field.getName();
-                for (AccessibleProperty property : all) {
+                for (AccessibleProperty property : accessibleProperties) {
                     String fName = property.propertyName;
                     if (fieldName.equals(fName)) {
                         Column fieldAnnotation = field.getAnnotation(Column.class);
@@ -73,32 +67,15 @@ public class Mapper<T> {
                 }
             }
         }
-
         //校验ID是否存在
-        AccessibleProperty[] ids = all.stream().filter(AccessibleProperty::isId).toArray(AccessibleProperty[]::new);
-        if (ids.length != 1) {
-            throw new RuntimeException("Require one @Id");
-        }
-
+        AccessibleProperty[] ids = accessibleProperties.stream().filter(AccessibleProperty::isId).toArray(AccessibleProperty[]::new);
+        VUtils.isError(ids.length != 1).throwMessage("Require one @Id");
         this.id = ids[0];
-        this.allProperties = all;
+        this.allProperties = accessibleProperties;
         this.allPropertiesMap = buildPropertiesMap(this.allProperties);
-        this.insertableProperties = all.stream().filter(AccessibleProperty::isNotId).collect(Collectors.toList());
-        this.updatableProperties = all.stream().collect(Collectors.toList());
         this.entityClass = clazz;
-
-        //初始化SQL
         this.tableName = getTableName(clazz);
-        this.selectSQL = "SELECT * FROM " + this.tableName + " WHERE " + this.id.columnName + " = ?";
-        this.insertSQL = "INSERT INTO " + this.tableName + " ("
-                + String.join(", ", this.insertableProperties.stream().map(p -> p.columnName).toArray(String[]::new))
-                + ") VALUES (" + numOfQuestions(this.insertableProperties.size()) + ")";
-        this.updateSQL = "UPDATE " + this.tableName + " SET "
-                + String.join(", ",
-                this.updatableProperties.stream().filter(AccessibleProperty::isNotId).map(p -> p.columnName + " = ?").toArray(String[]::new))
-                + " WHERE " + this.id.columnName + " = ?";
-        this.deleteSQL = "DELETE FROM " + this.tableName + " WHERE " + this.id.columnName + " = ?";
-
+        this.properties = accessibleProperties.stream().filter(AccessibleProperty::isNotId).collect(Collectors.toList());
         //jdbcTemplate 返回rowMapper
         this.rowMapper = new BeanPropertyRowMapper<>(this.entityClass);
     }
@@ -151,17 +128,7 @@ public class Mapper<T> {
         return result.toString().toLowerCase();
     }
 
-    /**
-     * ?包装返回值
-     * @param n
-     * @return
-     */
-    private String numOfQuestions(int n) {
-        String[] qs = new String[n];
-        return String.join(", ", Arrays.stream(qs).map((s) -> {
-            return "?";
-        }).toArray(String[]::new));
-    }
+
 
     /**
      * 获取表名
