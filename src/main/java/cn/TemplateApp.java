@@ -1,10 +1,10 @@
 package cn;
 
-import cn.hutool.extra.spring.SpringUtil;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
+ * 简单的JDBC框架
  * @author kangnan.chang
  */
 @SpringBootApplication
